@@ -1,20 +1,25 @@
 package com.ewha.aptinfocollector.VO;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Date;
 
 @Entity
+@Table(name="APT_TRXN_INFO")
 public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int TRXN_ID;
+    private int APT_CODE;
 
     private int TRXN_PRICE;
     private String TRXN_Y;
     private String TRXN_M;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date REG_DATE = new Date();
+
+
 
     public int getTRXN_ID() {
         return TRXN_ID;
