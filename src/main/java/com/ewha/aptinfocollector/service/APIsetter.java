@@ -6,6 +6,7 @@ import com.ewha.aptinfocollector.VO.Transaction;
 import com.ewha.aptinfocollector.repository.ApartmentRepository;
 import com.ewha.aptinfocollector.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -21,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -28,13 +30,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 // API를 호출해서 DB에 업데이트할 객체 리스트를 리턴하는 서비스
+@Service
 public class APIsetter {
     @Autowired
     ApartmentRepository apartmentRepository;
     @Autowired
     TransactionRepository transactionRepository;
 
-    public static void main (String locationCode, String date) throws IOException {
+    //String locationCode, String date
+    public static ArrayList<Apartment> main () throws IOException {
 
         BufferedReader rd;
         Document doc = null;
@@ -44,8 +48,9 @@ public class APIsetter {
         try {
             StringBuilder urlBuilder = new StringBuilder("http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev"); /*URL*/
             urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=SeCSY9%2FdXTuCWdFdAIAyTW83p3YFgmuJ4%2F%2BbT2sQzBxHOoCer8Wux5Y2rby0vcfoj5N4WbNQr1WLbfZ7%2B%2F0uGA%3D%3D"); /*Service Key*/
-            urlBuilder.append("&" + URLEncoder.encode("LAWD_CD","UTF-8") + "=" + URLEncoder.encode(locationCode, "UTF-8")); /*지역코드*/
-            urlBuilder.append("&" + URLEncoder.encode("DEAL_YMD","UTF-8") + "=" + URLEncoder.encode(date, "UTF-8")); /*계약월*/
+            urlBuilder.append("&" + URLEncoder.encode("LAWD_CD","UTF-8") + "=" + URLEncoder.encode("11110", "UTF-8")); /*지역코드*/
+            urlBuilder.append("&" + URLEncoder.encode("DEAL_YMD","UTF-8") + "=" + URLEncoder.encode("201801", "UTF-8")); /*계약월*/
+            urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("200", "UTF-8")); /*호출할row*/
 
             URL url = new URL(urlBuilder.toString());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -68,9 +73,6 @@ public class APIsetter {
             XPath xpath = xPathFactory.newXPath();
             XPathExpression xPathExpression = xpath.compile("//items/item");
             NodeList nodeList = (NodeList) xPathExpression.evaluate(doc, XPathConstants.NODESET);
-
-
-
 
             for (int i=0; i < nodeList.getLength(); i++) {
                 // child가 각 거래 건임.
@@ -100,6 +102,10 @@ public class APIsetter {
                 apartment.setGU_CODE(Integer.parseInt(node_GU_CODE.getTextContent()));
                 apartment.setDONG_CODE(Integer.parseInt(node_DONG_CODE.getTextContent()));
 
+                apartmentList.add(apartment);
+
+                System.out.println(apartment.getAPT_NM());
+                System.out.println(transaction.getTRXN_PRICE());
 
             }
 
@@ -111,5 +117,6 @@ public class APIsetter {
             System.out.println(e);
         }
 
+        return apartmentList;
     }
 }
