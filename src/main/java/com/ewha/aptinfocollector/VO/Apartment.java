@@ -1,8 +1,7 @@
 package com.ewha.aptinfocollector.VO;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table(name="APT_INFO")
@@ -11,19 +10,24 @@ public class Apartment {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int APT_CODE;
 
-    private String APT_NM;
+    @Column(name = "APT_NM")
+    private String name;
     private String APT_BUILD_Y;
-    private double APT_SQM;
-    private int APT_FLOOR;
+
+    @Column(name = "APT_SQM")
+    private double sqm;
+
+    @Column(name = "APT_FLOOR")
+    private int floor;
+
     private int GU_CODE;
     private int DONG_CODE;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date REG_DATE = new Date();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name="APT_CODE")
-    private Collection<Transaction> transactions;
+    @OneToMany(mappedBy="apartment",cascade = CascadeType.PERSIST)
+    private Set<Transaction> transactions = new HashSet<>();
 
     public int getAPT_CODE() {
         return APT_CODE;
@@ -33,12 +37,12 @@ public class Apartment {
         this.APT_CODE = APT_CODE;
     }
 
-    public String getAPT_NM() {
-        return APT_NM;
+    public String getName() {
+        return name;
     }
 
-    public void setAPT_NM(String APT_NM) {
-        this.APT_NM = APT_NM;
+    public void setName(String APT_NM) {
+        this.name = APT_NM;
     }
 
     public String getAPT_BUILD_Y() {
@@ -49,20 +53,20 @@ public class Apartment {
         this.APT_BUILD_Y = APT_BUILD_Y;
     }
 
-    public double getAPT_SQM() {
-        return APT_SQM;
+    public double getSqm() {
+        return sqm;
     }
 
-    public void setAPT_SQM(double APT_SQM) {
-        this.APT_SQM = APT_SQM;
+    public void setSqm(double sqm) {
+        this.sqm = sqm;
     }
 
-    public int getAPT_FLOOR() {
-        return APT_FLOOR;
+    public int getFloor() {
+        return floor;
     }
 
-    public void setAPT_FLOOR(int APT_FLOOR) {
-        this.APT_FLOOR = APT_FLOOR;
+    public void setFloor(int floor) {
+        this.floor = floor;
     }
 
     public int getGU_CODE() {
@@ -89,11 +93,11 @@ public class Apartment {
         this.REG_DATE = REG_DATE;
     }
 
-    public Collection<Transaction> getTransactions() {
+    public Set<Transaction> getTransactions() {
         return transactions;
     }
 
-    public void setTransactions(Collection<Transaction> transactions) {
+    public void setTransactions(Set<Transaction> transactions) {
         this.transactions = transactions;
     }
 }

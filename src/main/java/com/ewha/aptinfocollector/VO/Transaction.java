@@ -4,13 +4,16 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name="APT_TRXN_INFO")
+@Table(name="apt_trxn_info")
 public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int TRXN_ID;
-    private int APT_CODE;
+
+    @ManyToOne
+    @JoinColumn(name="apt_code", referencedColumnName = "apt_code")
+    private Apartment apartment;
 
     private int TRXN_PRICE;
     private String TRXN_Y;
@@ -19,7 +22,21 @@ public class Transaction {
     @Temporal(TemporalType.TIMESTAMP)
     private Date REG_DATE = new Date();
 
+    public Apartment getApartment() {
+        return apartment;
+    }
 
+    public void setApartment(Apartment apartment) {
+        this.apartment = apartment;
+    }
+
+    public Date getREG_DATE() {
+        return REG_DATE;
+    }
+
+    public void setREG_DATE(Date REG_DATE) {
+        this.REG_DATE = REG_DATE;
+    }
 
     public int getTRXN_ID() {
         return TRXN_ID;
