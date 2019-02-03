@@ -45,7 +45,7 @@ public class APIsetter {
             urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=SeCSY9%2FdXTuCWdFdAIAyTW83p3YFgmuJ4%2F%2BbT2sQzBxHOoCer8Wux5Y2rby0vcfoj5N4WbNQr1WLbfZ7%2B%2F0uGA%3D%3D"); /*Service Key*/
             urlBuilder.append("&" + URLEncoder.encode("LAWD_CD","UTF-8") + "=" + URLEncoder.encode(locationCode, "UTF-8")); /*지역코드*/
             urlBuilder.append("&" + URLEncoder.encode("DEAL_YMD","UTF-8") + "=" + URLEncoder.encode(date, "UTF-8")); /*계약월*/
-            urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("1000", "UTF-8")); /*호출할row*/
+            urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("100", "UTF-8")); /*호출할row*/
 
             URL url = new URL(urlBuilder.toString());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -75,33 +75,61 @@ public class APIsetter {
 
                 for (int j=0; j < result.getLength(); j++) {
                     Node node = result.item(j);
-                    switch (node.getNodeName()) {
-                        case "거래금액": {
-                            int price = Integer.parseInt(node.getTextContent().trim().replace(",",""));
-                            transaction.setTRXN_PRICE(price); break;
-                        }
-                        case "년": transaction.setTRXN_Y(node.getTextContent()); break;
-                        case "월": transaction.setTRXN_M(node.getTextContent()); break;
-                        case "건축년도": apartment.setAPT_BUILD_Y(node.getTextContent()); break;
-                        case "법정동시군구코드": apartment.setGU_CODE(Integer.parseInt(node.getTextContent())); break;
-                        case "법정동읍면동코드": apartment.setDONG_CODE(Integer.parseInt(node.getTextContent())); break;
-                        case "아파트": apartment.setName(node.getTextContent()); break;
-                        case "전용면적": apartment.setSqm(Double.parseDouble(node.getTextContent())); break;
-                        case "층": apartment.setFloor(Integer.parseInt(node.getTextContent())); break;
-
+                    String pName = node.getTextContent();
+                    Double pSqm = Double.parseDouble(node.getTextContent());
+                    Integer pFloor = Integer.parseInt(node.getTextContent());
+                    Apartment pApartment = apartmentRepository.findApartmentByNameAndFloorAndSqm(pName, pFloor, pSqm);
+                    String str = node.getTextContent().trim().replace(",","");
+                    if(!"".equals(str)) {
+                    	int price = Integer.parseInt(str);
+                    	 System.out.println(price);
                     }
-
-
+                    //Integer price = Integer.parseInt(node.getTextContent().trim().replace(",",""));
+                   
+                    /*if(pApartment.getAPT_CODE() < 0) {
+                    	   switch (node.getNodeName()) {
+                           case "거래금액": {
+                             //  int price = Integer.parseInt(node.getTextContent().trim().replace(",",""));
+                               transaction.setTRXN_PRICE(price); break;
+                           }
+                           case "년": transaction.setTRXN_Y(node.getTextContent()); break;
+                           case "월": transaction.setTRXN_M(node.getTextContent()); break;
+                           case "건축년도": apartment.setAPT_BUILD_Y(node.getTextContent()); break;
+                           case "법정동시군구코드": apartment.setGU_CODE(Integer.parseInt(node.getTextContent())); break;
+                           case "법정동읍면동코드": apartment.setDONG_CODE(Integer.parseInt(node.getTextContent())); break;
+                           case "아파트": apartment.setName(node.getTextContent()); break;
+                           case "전용면적": apartment.setSqm(Double.parseDouble(node.getTextContent())); break;
+                           case "층": apartment.setFloor(Integer.parseInt(node.getTextContent())); break;
+                       }
+                    	   transaction.setApartment(apartment);
+                    }
+                    else {
+                    	 switch (node.getNodeName()) {
+                         case "거래금액": {
+                             //int price = Integer.parseInt(node.getTextContent().trim().replace(",",""));
+                             transaction.setTRXN_PRICE(price); break;
+                         }
+                         case "년": transaction.setTRXN_Y(node.getTextContent()); break;
+                         case "월": transaction.setTRXN_M(node.getTextContent()); break;
+                       }
+                    	 transaction.setApartment(pApartment);
+                    	
+                    }*/
+                 
                 }
-                transaction.setApartment(apartment);
+               
+                apartmentRepository.save(apartment);
+                transactionRepository.save(transaction);
+            
 
-                if(apartmentRepository.existsByNameAndSqmAndFloor(apartment.getName(),apartment.getSqm(),apartment.getFloor())) {
-                    transactionRepository.save(transaction);
-                    apartmentRepository.save(apartment);
+           /*     if(apartmentRepository.existsByNameAndSqmAndFloor(apartment.getName(),apartment.getSqm(),apartment.getFloor())) {
+                	transactionRepository.save(transaction);
+                	apartmentRepository.delete(apartment);
+                    //apartmentRepository.save(apartment);
                 } else {
                     apartmentRepository.save(apartment);
                     transactionRepository.save(transaction);
-                }
+                }*/
 //                Node node_TRXN_PRICE = child.item(0);
 //                Node node_TRXN_Y = child.item(2);
 //                Node node_TRXN_M = child.item(17);
@@ -145,17 +173,21 @@ public class APIsetter {
 //                }
 
                 transaction = null;
+               // em.merge(apartment);
                 apartment = null;
 
 
             }
-
+            
+           
+            
             conn.disconnect();
         }
 
         catch (Exception e) {
             System.out.println(e);
         }
+        em.close();
 
     }
 }
