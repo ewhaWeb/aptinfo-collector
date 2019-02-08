@@ -5,6 +5,14 @@ import java.util.Date;
 
 @Entity
 @Table(name="apt_trxn_info")
+@NamedStoredProcedureQuery(
+		name = "calData", 
+		procedureName = "cal_data", 
+		parameters = { 
+			@StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "in_y"), 
+			@StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "in_m")
+		}
+	)
 public class Transaction {
 
     @Id

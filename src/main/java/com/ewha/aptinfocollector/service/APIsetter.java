@@ -76,12 +76,14 @@ public class APIsetter {
 			doc.getDocumentElement().normalize();
 			NodeList apiResults = doc.getElementsByTagName("item");
 
-			System.out.println(apiResults.getLength());
+			//System.out.println(apiResults.getLength());
 			for (int i = 0; i < apiResults.getLength(); i++) {
 				Transaction transaction = new Transaction();
 				Apartment apartment = new Apartment();
 				Node node = apiResults.item(i);
 				Element element = (Element) node;
+				
+				// 공통적으로 사용될 파라미터 변수에 담기
 				String pName = element.getElementsByTagName("아파트").item(0).getTextContent();
 				Double pSqm = Double.parseDouble(element.getElementsByTagName("전용면적").item(0).getTextContent());
 				Integer pFloor = Integer.parseInt(element.getElementsByTagName("층").item(0).getTextContent());
@@ -89,11 +91,15 @@ public class APIsetter {
 						element.getElementsByTagName("거래금액").item(0).getTextContent().trim().replace(",", ""));
 				String trxnY = element.getElementsByTagName("년").item(0).getTextContent();
 				String trxnM = element.getElementsByTagName("월").item(0).getTextContent();
+				
+				// 기존에 아파트 정보가 없으면, 아파트정보와 거래정보를 저장
 				if (!apartmentRepository.existsByNameAndSqmAndFloor(pName, pSqm, pFloor)) {
-					System.out.println("get in!!");
+					//System.out.println("get in!!");
 					transaction.setTRXN_PRICE(price);
 					transaction.setTRXN_Y(trxnY);
 					transaction.setTRXN_M(trxnM);
+					
+					// 아파트 정보
 					apartment.setAPT_BUILD_Y(element.getElementsByTagName("건축년도").item(0).getTextContent());
 					apartment.setGU_CODE(
 							Integer.parseInt(element.getElementsByTagName("법정동시군구코드").item(0).getTextContent()));
@@ -106,7 +112,8 @@ public class APIsetter {
 
 					transactionRepository.save(transaction);
 					apartmentRepository.save(apartment);
-
+					
+					// 기존에 아파트 정보가 있으면, 거래정보만 저장
 				} else {
 					transaction.setTRXN_PRICE(price);
 					transaction.setTRXN_Y(trxnY);
@@ -117,6 +124,7 @@ public class APIsetter {
 
 				}
 
+				// 객체 초기화
 				transaction = null;
 				apartment = null;
 			}
