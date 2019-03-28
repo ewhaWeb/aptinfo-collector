@@ -93,59 +93,18 @@ public class APIsetter {
 
 
                 }
-                transaction.setApartment(apartment);
 
-                if(apartmentRepository.existsByNameAndSqmAndFloor(apartment.getName(),apartment.getSqm(),apartment.getFloor())) {
+                Apartment existingApt = apartmentRepository.findApartmentByNameAndFloorAndSqm(apartment.getName(),apartment.getFloor(),apartment.getSqm());
+
+                if(existingApt!=null) {
+                    transaction.setApartment(existingApt);
                     transactionRepository.save(transaction);
-                    apartmentRepository.save(apartment);
                 } else {
+                    transaction.setApartment(apartment);
                     apartmentRepository.save(apartment);
                     transactionRepository.save(transaction);
                 }
-//                Node node_TRXN_PRICE = child.item(0);
-//                Node node_TRXN_Y = child.item(2);
-//                Node node_TRXN_M = child.item(17);
-//                Node node_APT_NM = child.item(16);
-//                Node node_APT_BUILD_Y = child.item(1);
-//                Node node_APT_SQM = child.item(20);
-//                Node node_APT_FLOOR = child.item(23);
-//                Node node_GU_CODE = child.item(13);
-//                Node node_DONG_CODE = child.item(14);
-//
-//
-//                int price = Integer.parseInt(node_TRXN_PRICE.getTextContent().trim().replace(",",""));
-//                String aptName = node_APT_NM.getTextContent();
-//                int aptFloor = Integer.parseInt(node_APT_FLOOR.getTextContent());
-//                double aptSqm = Double.parseDouble(node_APT_SQM.getTextContent());
-//                Boolean existingApartment = apartmentRepository.existsByNameAndSqmAndFloor(aptName, aptSqm, aptFloor);
-//
-//                if (!existingApartment) {
-//                    apartment.setName(aptName);
-//                    apartment.setAPT_BUILD_Y(node_APT_BUILD_Y.getTextContent());
-//                    apartment.setSqm(aptSqm);
-//                    apartment.setFloor(aptFloor);
-//                    apartment.setGU_CODE(Integer.parseInt(node_GU_CODE.getTextContent()));
-//                    apartment.setDONG_CODE(Integer.parseInt(node_DONG_CODE.getTextContent()));
-//
-//                    transaction.setTRXN_Y(node_TRXN_Y.getTextContent());
-//                    transaction.setTRXN_M(node_TRXN_M.getTextContent());
-//                    transaction.setApartment(apartment);
-//
-//                    apartmentRepository.save(apartment);
-//                    transactionRepository.save(transaction);
-//
-//                } else {
-//                    transaction.setTRXN_PRICE(price);
-//                    transaction.setTRXN_Y(node_TRXN_Y.getTextContent());
-//                    transaction.setTRXN_M(node_TRXN_M.getTextContent());
-//                    transaction.setApartment(existingApartment);
-//
-//                    transactionRepository.save(transaction);
-//
-//                }
 
-                transaction = null;
-                apartment = null;
 
 
             }
